@@ -1,0 +1,28 @@
+
+
+def graphing(time1, time2, time3, avgT1, avgT2, avgT3, times):
+ 
+    avg1=[]
+    avg2=[]
+    avg3=[]
+
+    for i in range(0,times):
+        avg1.append(avgT1)
+        avg2.append(avgT2)
+        avg3.append(avgT3)
+
+    plt.figure(1)
+
+    plt.subplot(111)
+
+    plt.plot(time1, lw=3, c='red')
+    plt.plot(avg1, lw=1, c='red')
+    plt.plot(time2, lw=3, c='green')   
+    plt.plot(avg2, lw=1, c='green')
+    plt.plot(time3, lw=3, c='blue')
+    plt.plot(avg3, lw=1, c='blue')
+    
+    plt.ylabel('Time(s)')
+    plt.xlabel('Tries')
+    
+    plt.show()
