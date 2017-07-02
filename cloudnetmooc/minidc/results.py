@@ -92,7 +92,7 @@ def createHTML(figure1, figure2, hosts, it, hostNames):
 
         f.write("<p><b>%s</b></p>\n" % figure['name'])
         f.write("<table>\n")
-        f.write("<tr><b><th>Host</th><th>No load</th><th>Medium load</th><th>High Load</th></b></tr>\n")
+        f.write("<tr><b><th>Host&nbsp;&nbsp;</th><th>No load&nbsp;&nbsp;&nbsp;     </th><th>Medium load&nbsp;&nbsp;</th><th>High Load     </th></b></tr>\n")
         for i in range(0, len(hosts)):
             f.write("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % ( hosts[i].name, 
                                                                                 str(average(figure['none']['times'][hosts[i].name])),
@@ -111,12 +111,12 @@ def createHTML(figure1, figure2, hosts, it, hostNames):
             f.write("<p><b>Load: %s</b></p>\n" % temp)
 
             pingsSec=round(it*len(hosts)/float(str(figure[temp]['timeTaken'])), 3)
-            throughput=0
+            throughput=pingsSec*128
     
             f.write('<p>Packets Dropped: %s<br>\n' % str(len(figure[temp]['dropped'])))
             f.write('Time elapsed: %ss<br>\n' % str(figure[temp]['timeTaken']))
-            f.write('Pings/second: %sms<br>\n' % str(pingsSec))
-            f.write('Throughput: %sMb/s<br></p>\n' % str(throughput))
+            f.write('Pings/second: %s<br>\n' % str(pingsSec))
+            f.write('Throughput: %sB/s<br></p>\n' % str(throughput))
 
             if len(figure[temp]['dropped']) != 0:
                 f.write("<p>Dropped pings:<br>\n")
@@ -134,6 +134,10 @@ def createHTML(figure1, figure2, hosts, it, hostNames):
     f.write('<img src="%s"><br>\n' % fnameNone)
     f.write('<img src="%s"><br>\n' % fnameMed)
     f.write('<img src="%s"><br>\n' % fnameHigh)
+
+    f.write("<p><b>Hardware + software info<b></p>")
+    f.write('<img src="%s"><br>\n' % "hardware.png")
+    
 
     print "*** Report created"
 

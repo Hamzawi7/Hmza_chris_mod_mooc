@@ -1,5 +1,6 @@
 
 import matplotlib.pyplot as plt
+#import matplotlib.lines as mlines
 import numpy as np
 from datetime import datetime
 
@@ -9,40 +10,80 @@ def average(l):
     avg=round(avg, 4)
     return avg
 
-def graphing(YesLoad, h):
+def graphing(static, adaptive, h, fname):
     "take raw data gathered as arguments"    
 
-    "create figure and plot"
-    plt.figure(1)
-    plt.subplot(111)
+    for i in range(0, 3):
 
-    "label axis"
-    plt.ylabel('Ping(ms)')
-    plt.xlabel('Hosts')
-    plt.ylim(0,2500)
-    "Give title"
-    plt.title("yoyoyooyoyoyooyooooooo")
-    
-    "insert hosts along x axis"
-    plt.xticks(np.arange(len(h)),h)
+        avgStatic=[]
+        avgAdaptive=[]
+        if i == 0: 
+            temp = 'none'
+            plt.figure(1)
+            fnames=fname+'-%s.png' % temp
+            fnameNone=fnames
+            title='No'
+        elif i == 1: 
+            temp = 'med'
+            plt.figure(2)
+            fnames=fname+'-%s.png' % temp
+            fnameMed=fnames
+            title='Medium'
+        elif i == 2: 
+            temp = 'high'
+            plt.figure(3)
+            fnames=fname+'-%s.png' % temp
+            fnameHigh=fnames
+            title='High'
 
-    avg=[]
-    for o in range(0,len(h)):
-        avg.append(average(YesLoad[h[o]]))
         
-    plt.plot(range(0,len(h)), avg, 'o-')
-    
 
-    "show graph"
-    plt.show()
+        plt.subplot(111)
+        "label axis"
+        plt.ylabel('Ping(ms)')
+        plt.xlabel('Hosts')
+        "Give title"
+        plt.title("Average ping times to hosts - %s load" % title)
+        "insert hosts along x axis"
+        plt.xticks(np.arange(len(h)),h)
+
+        high=0
+        for o in range(0,len(h)):
+
+            s=average(static[temp]['times'][h[o]])
+            a=average(adaptive[temp]['times'][h[o]])
+            if s > high: high=s
+            if a > high: high=a
+
+            avgStatic.append(s)
+            avgAdaptive.append(a)
+        
+        
+        plt.ylim(0, high+round(float(high/3)))
+        staticLine, =plt.plot(range(0,len(h)), avgStatic, 'ro-', label='Static Policy')
+        adaptiveLine, =plt.plot(range(0,len(h)), avgAdaptive, 'go-', label='Adaptive Policy')
+        plt.legend([staticLine, adaptiveLine], ['Static Policy', 'Adaptive Policy'])
+        avgAvgStatic=[]
+        avgAvgAdaptive=[]
+        s=average(avgStatic)
+        a=average(avgAdaptive)
+        for i in range(0,len(h)):
+            avgAvgStatic.append(s)
+            avgAvgAdaptive.append(a)
+        plt.plot(range(0, len(h)), avgAvgStatic, 'r--')
+        plt.plot(range(0, len(h)), avgAvgAdaptive, 'g--')
+        
+        plt.savefig(fnames)
+    return fnameNone, fnameMed, fnameHigh
 
 
 
-def createHTML(figure1, figure2, hosts, it):
-    print "*** Generating Document"
+def createHTML(figure1, figure2, hosts, it, hostNames):
+    print "*** Generating Report"
     now=datetime.now()
-    now=now.strftime('%Y_%m_%d_%H_%M_%S')
-    f=open('results-'+now+'.html', 'w+')
+    now=now.strftime('%Y_%m_%d-%H_%M_%S')
+    fname='results-'+now
+    f=open(fname+'.html', 'w+')
     f.write("<!doctype html>\n")
     f.write("<h1>Results - %s</h1>\n" % now)
     for i in range(0,2):
@@ -88,72 +129,20 @@ def createHTML(figure1, figure2, hosts, it):
                 f.write("%s: %s<br>\n" % (str(h.name), (figure[temp]['times'][h.name])))
             f.write("</p>\n")
 
-    print "*** Document created"
+    fnameNone, fnameMed, fnameHigh = graphing(figure1, figure2, hostNames, fname)
+    f.write('<p><b>Graphs</b></p>\n')
+    f.write('<img src="%s"><br>\n' % fnameNone)
+    f.write('<img src="%s"><br>\n' % fnameMed)
+    f.write('<img src="%s"><br>\n' % fnameHigh)
 
-    f.close()
+    print "*** Report created"
 
-def p(figure, hosts, it):
-    
-    print "*** %s\n" % (figure['name'])
-    print "\033[1m"+"\tHost\t\tNo Load \tMedium Load\tHigh Load"+"\033[0m"
-    for i in range(0, len(hosts)):
-        print "\t%s:\t\t%sms   \t%sms   \t%sms" % ( hosts[i].name, 
-                                                    str(average(figure['none']['times'][hosts[i].name])), 
-                                                    str(average(figure['med']['times'][hosts[i].name])), 
-                                                    str(average(figure['high']['times'][hosts[i].name])) )
-    
-
-    print "\n\tTraffic stats\n"
-    for i in range(0,3):
-
-        if i == 0: temp='none'
-        elif i == 1: temp='med'
-        elif i == 2: temp='high'
-        
-        print "\t%s" % temp
-
-        pingsSec=round(it*len(hosts)/float(str(figure[temp]['timeTaken'])), 3)
-        throughput=0
-        print "\tPackets Dropped: %s \n\tTime Elapsed: %ss \n\tPings/second: %sms \n\tThroughput: %sMb/s" % ( str(len(figure[temp]['dropped'])),
-                                                                                            str(figure[temp]['timeTaken']),
-                                                                                            str(pingsSec), str(throughput) )
-        if len(figure[temp]['dropped']) != 0:
-            print "\tDropped pings:"
-            for i in range( 0, len(figure[temp]['dropped']) ):
-                print "\t\tah2 -> %s" % str(figure[temp]['dropped'][i])
-
-        print "\tTimes:"
-        for h in hosts:
-            print "\t\t%s: %s" % (str(h.name), (figure[temp]['times'][h.name]))
-        print "\n"
-    
+    f.close()    
         
 
 def init(hostNames, hosts, static, adaptive, it):
     
-    "print results of tests to user in table"
     print "*** Results"
-
-    while True:
-        pRes=raw_input("\tWould you like to print the results [y/n]? ")
-        if pRes.lower() in ['y', 'n']:
-            break
-        else:
-            print "\tInvalid input."
-            continue
     
+    createHTML(static, adaptive, hosts, it, hostNames)
     
-    if pRes.lower() == 'y':
-        p(static, hosts, it)
-        p(adaptive, hosts, it)
-
-    while True:
-        cRes=raw_input("\tWould you like to create a file of results [y/n]? ")
-        if cRes.lower() in ['y', 'n']:
-            break
-        else:
-            print "\tInvalid input."
-            continue
-
-    if cRes.lower() == 'y':
-        createHTML(static, adaptive, hosts, it)

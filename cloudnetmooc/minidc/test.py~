@@ -26,9 +26,11 @@ def launchAttack(net, h, load, targ, strength):
     if strength == "high":
         perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
     elif strength == "med":
-        load="4800K"
+        load="4M"
         perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
-    
+    elif strength == "low":
+        load="1M"
+        perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
     "Launch attack against target"
     print "\t%s" % perf
     ah1.cmd(perf)
@@ -91,12 +93,6 @@ def pingTest(net, h, it):
     return pingList, dropped, round(p2-p1,3)
 
 def run(net, h, targ, strength, it, pol, load, wait):
-    
-    if strength == "none":
-        times, dropped, timeTaken =pingTest(net, h, it)
-        print "*** Load test completed - %s, %s" % (strength, pol)
-        time.sleep(wait/4)
-        return times, dropped, timeTaken
 
     "initilize iperf server"
     initIperfServer(net, h, targ)
@@ -124,9 +120,9 @@ def run(net, h, targ, strength, it, pol, load, wait):
 def start(net, topo):
     
     "arguments for controlling tests"
-    it=20
-    wait=20/4
-    load="5M"
+    it=50
+    wait=20
+    load="7M"
     targ="h4"
     
     "create list of passive hosts"
@@ -153,7 +149,7 @@ def start(net, topo):
     raw_input()
     pol="static"
 
-    static['none']['times'], static['none']['dropped'], static['none']['timeTaken'] = run(net, h, targ, "none", it, pol, load, wait)
+    static['none']['times'], static['none']['dropped'], static['none']['timeTaken'] = run(net, h, targ, "low", it, pol, load, wait)
     static['med']['times'], static['med']['dropped'], static['med']['timeTaken'] = run(net, h, targ, "med", it, pol, load, wait)
     static['high']['times'], static['high']['dropped'], static['high']['timeTaken']  = run(net, h, targ, "high", it, pol, load, wait)
     
@@ -163,7 +159,7 @@ def start(net, topo):
     raw_input()
     pol="adaptive"
 
-    adaptive['none']['times'], adaptive['none']['dropped'], adaptive['none']['timeTaken'] = run(net, h, targ, "none", it, pol, load, wait)
+    adaptive['none']['times'], adaptive['none']['dropped'], adaptive['none']['timeTaken'] = run(net, h, targ, "low", it, pol, load, wait)
     adaptive['med']['times'], adaptive['med']['dropped'], adaptive['med']['timeTaken'] = run(net, h, targ, "med", it, pol, load, wait)
     adaptive['high']['times'], adaptive['high']['dropped'], adaptive['high']['timeTaken'] = run(net, h, targ, "high", it, pol, load, wait)
     print "*** Adaptive policy tests finished"
