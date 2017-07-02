@@ -25,7 +25,8 @@ class FattreeTopology(Topo):
         self._edgeSwitches = []
         self._hosts = []
         self._links = {}
-
+        
+        "Added additional switch"
         switch=self.addSwitch("a1",protocols="OpenFlow13")
         self._edgeSwitches.append(switch)
         self._links["a1"]=[]
@@ -55,6 +56,7 @@ class FattreeTopology(Topo):
             self._links[host] = [switch]
             self._links[switch].append(host)
         
+        "Added attacking and testing servers"
         self.addHost("ah1")
         self._hosts.append("ah1")
         self.addLink("a1", "ah1", **linkopts2)
