@@ -68,17 +68,7 @@ class AdaptivePolicy(object):
         return self.build(self.topo)
 
     def minUtilization(self):
-        # ASSIGNMENT 4:
-        # This function should return the core switch that
-        # is least utilized.  We will use this to greedily
-        # assign hosts to core switches based on the amount
-        # of traffic they are receiving and balance load
-        # on the core switches.
-
-        # Use the dictionary self.utilization
-        # (key = switch name, value = utilization in bytes)
-        # to find the least utilized switch.
-
+        "find minimum utilization"
         minim = min(self.utilization, key=self.utilization.get)
         return minim
 
