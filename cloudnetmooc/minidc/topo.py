@@ -70,3 +70,10 @@ class FattreeTopology(Topo):
         self._links["ah2"]=[]
         self._links["ah2"].append("a1")
         self._links["a1"].append("ah2")
+
+        self.addHost("ah3")
+        self._hosts.append("ah3")
+        self.addLink("a1", "ah3", **linkopts2)
+        self._links["ah3"]=[]
+        self._links["ah3"].append("a1")
+        self._links["a1"].append("ah3")
