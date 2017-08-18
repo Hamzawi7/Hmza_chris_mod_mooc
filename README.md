@@ -1,9 +1,8 @@
 # Using Load Balancing Policy to Mitigate DDoS attacks in SDN networks
 
-"This is the source code of the Project"
-
-# This is based on chris-mods-mooc package, I have added some fuctions like Zombie area, security alarming to mitigate and detect the attacks in SDN network
-# the topology that have used in this package is a fat tree topology with zombie area and testing server.
+#This is the source code of the Project
+" This is based on chris-mods-mooc package, I have added some fuctions like Zombie area, security alarming to mitigate and detect the attacks in SDN network"
+" the topology that have used in this package is a fat tree topology with zombie area and testing server."
 
 "How to start"
 #After downloading the package, start cloudnetmooc on VirtualBox
