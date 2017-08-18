@@ -5,48 +5,63 @@ import time
 import random
 
 
-def initIperfServer(net, h, targ):
+def initIperfServer(net, h, targ, targ2):
     
-    print "*** Initilizing iPerf server on h4"
-    "Get h4 object and run an iperf server"
+    print "*** Initilizing iPerf server on h2"
+    "Get h5 object and run an iperf server"
     target = net.get(targ)
     perfServer="iperf -s -u -p 7890 &"
     print "\t%s" % perfServer
     target.cmd(perfServer)
 
+    print "*** Initilizing iPerf server on h5"
+    "Get h5 object and run an iperf server"
+    target2 = net.get(targ2)
+    perfServer="iperf -s -u -p 7890 &"
+    print "\t%s" % perfServer
+    target2.cmd(perfServer)
 
-def launchAttack(net, h, load, targ, strength):
+
+def launchAttack(net, h, load, targ, strength, targ2):
 
     "Get objects"
     target=net.get(targ)
+    target2=net.get(targ2)
     ah1 = net.get("ah1")
+    ah3 = net.get("ah3")
     print "*** Launching Attack"
-
+    
     "medium or high load"
     if strength == "high":
         perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
+        perf2=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target2.IP(), load))
     elif strength == "med":
         load="4M"
         perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
+        perf2=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target2.IP(), load))
     elif strength == "low":
         load="1M"
         perf=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target.IP(), load))
+        perf2=("iperf -t 9999 -c %s -p 7890 -b %s &" % (target2.IP(), load))
     "Launch attack against target"
     print "\t%s" % perf
     ah1.cmd(perf)
+    ah3.cmd(perf2)
 
 def stopJobs(net, h):
 
     print "*** Stopping Jobs"
-
+    
     "kill all jobs on each host"
     for i in range(0,len(h)):
         h[i].cmd("jobs -p | xargs kill")
 
     ah1=net.get("ah1")
     ah2=net.get("ah2")
+    ah3=net.get("ah3")
     ah1.cmd("jobs -p | xargs kill")
     ah2.cmd("jobs -p | xargs kill")
+    ah3.cmd("jobs -p | xargs kill")
 
 def pingTest(net, h, it):
     
@@ -93,13 +108,13 @@ def pingTest(net, h, it):
     p2=time.time()
     return pingList, dropped, round(p2-p1,3)
 
-def run(net, h, targ, strength, it, pol, load, wait):
+def run(net, h, targ, strength, it, pol, load, wait, targ2):
 
     "initilize iperf server"
-    initIperfServer(net, h, targ)
+    initIperfServer(net, h, targ, targ2)
 
     "perform ping test whilst under load"
-    launchAttack(net, h, load, targ, strength)
+    launchAttack(net, h, load, targ, strength, targ2)
 
     "wait for traffic to build up"
     print "*** Waiting for traffic"    
@@ -121,17 +136,20 @@ def run(net, h, targ, strength, it, pol, load, wait):
 def start(net, topo):
     
     "arguments for controlling tests"
-    it=5
+    it=30
     wait=20/10
     load="6M"
-    targ="h4"
+    targ="h2"
+    targ="h5"
+
     
     "create list of passive hosts"
     h=[]
     for host in net.hosts:
         if host.name != "ah1":
             if host.name != "ah2":
-                h.append(host)
+                if host.name != "ah3":
+                    h.append(host)
     
 
     static={}
