@@ -2,7 +2,7 @@
 
 #This is the source code of the Project
 
-" This is based on chris-mods-mooc package, I have added some fuctions like Zombie area, security alarming to mitigate and detect the attacks in SDN network"
+"New fuctions like Zombie area, security alarming have been added to mitigate and detect the attacks in SDN network, the other methods are based onThis is based on chris-mods-mooc package"
 
 " the topology that have used in this package is a fat tree topology with zombie area and testing server."
 
